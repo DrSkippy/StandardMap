@@ -10,7 +10,7 @@ TWO_PI = 2.0 * np.pi
 
 
 class App:
-    DIM = 800
+    DIM = 1600
     FPS_TARGET = 30
     ITERS_PER_FRAME = 40
     DOUBLE_CLICK_MS = 400
