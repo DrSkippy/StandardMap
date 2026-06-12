@@ -4,7 +4,7 @@ TWO_PI = 2.0 * np.pi
 
 
 class CoordTransform:
-    DIM = 800
+    DIM = 1600
 
     def __init__(self) -> None:
         self.reset()
