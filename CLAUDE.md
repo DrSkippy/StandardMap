@@ -99,6 +99,75 @@ The core improvement task: seed trajectories across **both** x and y dimensions 
 | High-resolution fractal detail | 2 000–10 000 (quasi-random) |
 | Zoom-in adaptive | scale with viewport area |
 
+## Environment Setup with uv
+
+[uv](https://docs.astral.sh/uv/) is the recommended tool for managing the Python environment and dependencies for this project.
+
+### Install uv
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Create and activate the virtual environment
+
+```bash
+# Create a .venv in the project root (Python 3.11+ recommended)
+uv venv --python 3.11
+
+# Activate
+source .venv/bin/activate        # macOS / Linux
+.venv\Scripts\activate           # Windows
+```
+
+### Install dependencies
+
+```bash
+# Core dependencies
+uv pip install numpy scipy pygame
+
+# Optional: Jupyter for exploratory work
+uv pip install jupyterlab matplotlib
+```
+
+### Pin dependencies with a lockfile
+
+```bash
+# Generate a requirements file from the active environment
+uv pip freeze > requirements.txt
+
+# Recreate the exact environment from the lockfile
+uv pip sync requirements.txt
+```
+
+### Recommended `pyproject.toml` (once the Python source exists)
+
+```toml
+[project]
+name = "standard-map"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "pygame>=2.5",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "jupyterlab",
+    "matplotlib",
+]
+```
+
+With a `pyproject.toml` present, use:
+
+```bash
+uv sync          # install all deps into .venv
+uv sync --extra dev   # include dev deps too
+uv run python standard_map.py   # run without activating manually
+```
+
 ## File Map
 
 | File | Purpose |
@@ -113,7 +182,15 @@ The core improvement task: seed trajectories across **both** x and y dimensions 
 # Run original Processing sketch (requires Processing IDE or processing-java)
 processing-java --sketch=. --run
 
-# Python replication (once created)
+# Set up Python environment (first time)
+uv venv --python 3.11
+uv sync
+
+# Run Python replication
+uv run python standard_map.py
+
+# Or activate the venv and run directly
+source .venv/bin/activate
 python standard_map.py
 ```
 
