@@ -187,12 +187,30 @@ uv venv --python 3.11
 uv sync
 
 # Run Python replication
-uv run python standard_map.py
+uv run standard-map                          # via pyproject.toml script entry
+uv run python -m standard_map                # via package __main__
+uv run python run.py                         # via convenience shim
+
+# With options
+uv run standard-map --seed-mode quasi_random --nx 50 --ny 50
+uv run standard-map --K 1.2 --color-mode legacy_rgb
 
 # Or activate the venv and run directly
 source .venv/bin/activate
-python standard_map.py
+python -m standard_map
 ```
+
+### Keyboard shortcuts (Python version)
+
+| Key | Action |
+|-----|--------|
+| Drag | Zoom into rectangle |
+| Double-click | Reset to full view |
+| `r` / Esc | Reset to full view |
+| `s` | Cycle seed mode (grid → quasi_random → legacy) |
+| `↑` / `↓` | Increase / decrease K by 0.01 |
+| `+` / `-` | Increase / decrease grid density (±5 per axis) |
+| `q` | Quit |
 
 ## Key References
 
