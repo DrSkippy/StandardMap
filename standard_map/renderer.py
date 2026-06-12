@@ -6,7 +6,7 @@ class Renderer:
     def __init__(self, surface: pygame.Surface, dim: int = 800) -> None:
         self._surface = surface
         self._dim = dim
-        self._font = pygame.font.SysFont("monospace", 12)
+        self._font = pygame.font.SysFont("monospace", 24)
 
     def clear(self, color: tuple = (0, 0, 0)) -> None:
         self._surface.fill(color)
@@ -47,11 +47,11 @@ class Renderer:
             f"fps={fps:.0f}",
         ]
         # opaque background behind HUD so text stays readable over accumulated points
-        pygame.draw.rect(self._surface, (0, 0, 0), (10, 10, 210, len(lines) * 16 + 8))
+        pygame.draw.rect(self._surface, (0, 0, 0), (10, 10, 420, len(lines) * 30 + 10))
         color = (0, 200, 200)
         for i, line in enumerate(lines):
             surf = self._font.render(line, True, color)
-            self._surface.blit(surf, (14, 14 + i * 16))
+            self._surface.blit(surf, (16, 16 + i * 30))
 
     def draw_zoom_rect(
         self,
