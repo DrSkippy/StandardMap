@@ -164,7 +164,7 @@ With a `pyproject.toml` present, use:
 
 ```bash
 uv sync          # install all deps into .venv
-uv sync --extra dev   # include dev deps too
+uv sync               # dev dependency group is included by default
 uv run python standard_map.py   # run without activating manually
 ```
 
@@ -175,6 +175,20 @@ uv run python standard_map.py   # run without activating manually
 | `StandardMap.pde` | Original Processing source — reference implementation |
 | `StandardMap.png` | Reference output image |
 | `data/SansSerif-12.vlw` | Processing font (not needed in Python) |
+| `standard_map/config.py` | Enums (`SeedMode`, `ColorMode`) and frozen dataclasses for every tunable; TOML loading |
+| `standard_map/exceptions.py` | `StandardMapError` hierarchy |
+| `standard_map/seeding.py` | Seeder functions + `SEEDERS` registry |
+| `standard_map/map_engine.py` | `wrap_to_torus`, `standard_map_step`, `MapEngine` state |
+| `standard_map/viewport.py` | `Bounds`, `CoordTransform` (data ↔ pixel, zoom) |
+| `standard_map/projection.py` | `project_and_clip` for a batch of iterations |
+| `standard_map/color.py` | Per-trajectory color tables |
+| `standard_map/renderer.py` | pygame drawing: points, HUD, zoom rectangle |
+| `standard_map/gestures.py` | Double-click and drag state machines (pygame-free) |
+| `standard_map/controls.py` | Key bindings table and window caption |
+| `standard_map/app.py` | `App` orchestrator, `build_app`, `main` |
+| `standard_map/cli.py` | argparse → `AppConfig` |
+| `standard_map.example.toml` | All configurable values with defaults |
+| `tests/` | pytest suite (headless pygame via `SDL_VIDEODRIVER=dummy`) |
 
 ## Development Workflow
 
@@ -194,6 +208,12 @@ uv run python run.py                         # via convenience shim
 # With options
 uv run standard-map --seed-mode quasi_random --nx 50 --ny 50
 uv run standard-map --K 1.2 --color-mode legacy_rgb
+uv run standard-map --config standard_map.example.toml   # every calibration value lives here
+
+# Tests, lint, type check (coverage gate: 80%)
+uv run pytest
+uv run ruff check standard_map tests
+uv run mypy
 
 # Or activate the venv and run directly
 source .venv/bin/activate
@@ -208,8 +228,8 @@ python -m standard_map
 | Double-click | Reset to full view |
 | `r` / Esc | Reset to full view |
 | `s` | Cycle seed mode (grid → quasi_random → legacy) |
-| `↑` / `↓` | Increase / decrease K by 0.01 |
-| `+` / `-` | Increase / decrease grid density (±5 per axis) |
+| `↑` / `↓` | Increase / decrease K by 0.01 (`physics.K_step`) |
+| `+` / `-` | Increase / decrease seed density (±5 per axis, `seeding.density_step`) |
 | `q` | Quit |
 
 ## Key References
