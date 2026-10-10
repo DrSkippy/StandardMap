@@ -3,6 +3,7 @@ import pygame
 
 from .map_engine import MapEngine
 from .viewport import CoordTransform
+from .projection import project_and_clip
 from .renderer import Renderer
 from .color import make_color_table
 from .config import SeedingConfig, SeedMode
@@ -48,7 +49,7 @@ class App:
         self._surface = pygame.display.set_mode((self.DIM, self.DIM))
         pygame.display.set_caption("Chirikov Standard Map  [drag=zoom  dbl-click=reset  r=reset  s=cycle-seed  ↑↓=K  q=quit]")
         self._renderer = Renderer(self._surface, self.DIM)
-        self._viewport = CoordTransform()
+        self._viewport = CoordTransform(self.DIM)
         self._engine = MapEngine(
             K=self._K,
             seeding=SeedingConfig(mode=SeedMode(self._seed_mode), nx=self._nx, ny=self._ny),
@@ -84,8 +85,8 @@ class App:
         self._reseed_and_clear()
 
     def _reseed_and_clear(self) -> None:
-        x1, x2, y1, y2 = self._viewport.data_bounds
-        self._engine.reseed((x1, x2), (y1, y2))
+        bounds = self._viewport.bounds
+        self._engine.reseed(bounds.x_range, bounds.y_range)
         self._colors = make_color_table(self._engine.n_trajectories, self._color_mode)
         self._renderer.clear()
 
@@ -94,31 +95,13 @@ class App:
     # ------------------------------------------------------------------
 
     def _render_frame(self, fps: float) -> None:
-        xs_raw, ys_raw = self._engine.step(self.ITERS_PER_FRAME)
-        # xs_raw, ys_raw: shape (ITERS_PER_FRAME, N)
-        n_iter, N = xs_raw.shape
+        # xs, ys: shape (ITERS_PER_FRAME, N)
+        xs, ys = self._engine.step(self.ITERS_PER_FRAME)
+        points = project_and_clip(xs, ys, self._viewport)
+        self._renderer.draw_points(points.cols, points.rows, self._colors[points.trajectory_index])
 
-        xs_flat = xs_raw.ravel()   # (n_iter*N,)
-        ys_flat = ys_raw.ravel()
-
-        px_col, px_row = self._viewport.data_to_pixel(xs_flat, ys_flat)
-
-        mask = (
-            (px_col >= 0) & (px_col < self.DIM) &
-            (px_row >= 0) & (px_row < self.DIM)
-        )
-        px_col = px_col[mask]
-        px_row = px_row[mask]
-
-        # tile colors so each trajectory keeps its color across all iterations
-        # np.tile((N,3), (n_iter,1)) → (n_iter*N, 3), then apply same mask
-        colors_tiled = np.tile(self._colors, (n_iter, 1))
-        colors_masked = colors_tiled[mask]
-
-        self._renderer.draw_points(px_col, px_row, colors_masked)
-
-        x1, _x2, y1, _y2 = self._viewport.data_bounds
-        self._renderer.draw_hud(x1, y1, self._engine.K, self._seed_mode,
+        bounds = self._viewport.bounds
+        self._renderer.draw_hud(bounds.x_min, bounds.y_min, self._engine.K, self._seed_mode,
                                  self._engine.n_trajectories, fps)
         pygame.display.flip()
 

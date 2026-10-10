@@ -52,7 +52,7 @@ def test_legacy_rgb_table():
 
 
 def test_zoom_bounds():
-    view = CoordTransform()
+    view = CoordTransform(1600)
     view.zoom_to_pixel_rect(0, 0, 800, 400)
-    x1, x2, y1, y2 = view.data_bounds
-    np.testing.assert_allclose([x1, x2, y1, y2], [0.0, np.pi, 0.0, np.pi / 2])
+    b = view.bounds
+    np.testing.assert_allclose([b.x_min, b.x_max, b.y_min, b.y_max], [0.0, np.pi, 0.0, np.pi / 2])
