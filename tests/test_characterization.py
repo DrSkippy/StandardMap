@@ -5,6 +5,7 @@ import colorsys
 import numpy as np
 
 from standard_map.color import make_color_table
+from standard_map.config import SeedingConfig
 from standard_map.map_engine import MapEngine
 from standard_map.viewport import CoordTransform
 
@@ -26,7 +27,7 @@ def reference_orbit(x, y, K, n_iter):
 
 
 def test_grid_orbit_matches_reference():
-    engine = MapEngine(K=0.97, seed_mode="grid", nx_seeds=7, ny_seeds=5)
+    engine = MapEngine(K=0.97, seeding=SeedingConfig(nx=7, ny=5))
     engine.reseed(FULL, FULL)
     x0, y0 = engine.x.copy(), engine.y.copy()
     xs, ys = engine.step(40)

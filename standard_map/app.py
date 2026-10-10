@@ -5,6 +5,7 @@ from .map_engine import MapEngine
 from .viewport import CoordTransform
 from .renderer import Renderer
 from .color import make_color_table
+from .config import SeedingConfig, SeedMode
 
 TWO_PI = 2.0 * np.pi
 
@@ -50,9 +51,7 @@ class App:
         self._viewport = CoordTransform()
         self._engine = MapEngine(
             K=self._K,
-            seed_mode=self._seed_mode,
-            nx_seeds=self._nx,
-            ny_seeds=self._ny,
+            seeding=SeedingConfig(mode=SeedMode(self._seed_mode), nx=self._nx, ny=self._ny),
         )
         self._reset()
         clock = pygame.time.Clock()
@@ -188,10 +187,8 @@ class App:
             pygame.event.post(pygame.event.Event(pygame.QUIT))
 
         elif event.key == pygame.K_s:
-            modes = ["grid", "quasi_random", "legacy"]
-            idx = (modes.index(self._seed_mode) + 1) % len(modes)
-            self._seed_mode = modes[idx]
-            self._engine._seed_mode = self._seed_mode
+            self._seed_mode = SeedMode(self._seed_mode).next()
+            self._engine.set_seed_mode(self._seed_mode)
             self._reseed_and_clear()
 
         elif event.key == pygame.K_UP:
@@ -205,15 +202,13 @@ class App:
         elif event.key in (pygame.K_PLUS, pygame.K_EQUALS, pygame.K_KP_PLUS):
             self._nx = min(self._nx + 5, 100)
             self._ny = min(self._ny + 5, 100)
-            self._engine._nx = self._nx
-            self._engine._ny = self._ny
+            self._engine.set_density(self._nx, self._ny)
             self._reseed_and_clear()
 
         elif event.key in (pygame.K_MINUS, pygame.K_KP_MINUS):
             self._nx = max(self._nx - 5, 5)
             self._ny = max(self._ny - 5, 5)
-            self._engine._nx = self._nx
-            self._engine._ny = self._ny
+            self._engine.set_density(self._nx, self._ny)
             self._reseed_and_clear()
 
 
