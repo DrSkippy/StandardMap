@@ -1,0 +1,50 @@
+# Example configuration for the Standard Map viewer.
+# Copy to e.g. standard_map.toml, edit, and run:
+#   uv run standard-map --config standard_map.toml
+# Every key is optional; omitted keys keep their defaults (shown here).
+# Command-line flags override values from this file.
+
+[physics]
+K = 0.97                # 0.97 is the "edge" of chaos (K_c ~= 0.9716)
+K_step = 0.01           # up/down arrow increment
+K_round_decimals = 4
+
+[seeding]
+mode = "grid"           # grid | quasi_random | legacy
+nx = 20
+ny = 20
+density_step = 5        # +/- key increment per axis
+density_min = 5
+density_max = 100
+legacy_count = 85       # trajectory count of the original Processing sketch
+# rng_seed = 12345      # fix the Halton scramble for reproducible runs
+
+[display]
+window_px = 1600
+fps_target = 30
+iters_per_frame = 40
+min_zoom_px = 2
+title = "Chirikov Standard Map"
+
+[input]
+double_click_ms = 400
+double_click_radius_px = 5
+
+[color]
+mode = "hsv_cycle"      # hsv_cycle | legacy_rgb
+hsv_saturation = 0.75
+hsv_value = 0.92
+legacy_green = 100
+legacy_blue = 200
+
+[render]
+background = [0, 0, 0]
+zoom_rect_color = [255, 0, 0]
+font_name = "monospace"
+font_size = 12
+hud_origin = [10, 10]
+hud_width = 210
+hud_line_height = 16
+hud_padding = 4
+hud_foreground = [0, 200, 200]
+hud_background = [0, 0, 0]
