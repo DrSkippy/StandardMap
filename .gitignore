@@ -1,3 +1,10 @@
 # Python bytecache
 __pycache__/
 .venv/
+
+# Test / coverage artifacts
+.coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
