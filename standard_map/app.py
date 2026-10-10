@@ -4,9 +4,9 @@ import pygame
 from .map_engine import MapEngine
 from .viewport import CoordTransform
 from .projection import project_and_clip
-from .renderer import Renderer
+from .renderer import HudStatus, Renderer
 from .color import make_color_table
-from .config import SeedingConfig, SeedMode
+from .config import RenderConfig, SeedingConfig, SeedMode
 
 TWO_PI = 2.0 * np.pi
 
@@ -48,7 +48,7 @@ class App:
         pygame.init()
         self._surface = pygame.display.set_mode((self.DIM, self.DIM))
         pygame.display.set_caption("Chirikov Standard Map  [drag=zoom  dbl-click=reset  r=reset  s=cycle-seed  ↑↓=K  q=quit]")
-        self._renderer = Renderer(self._surface, self.DIM)
+        self._renderer = Renderer(self._surface, RenderConfig())
         self._viewport = CoordTransform(self.DIM)
         self._engine = MapEngine(
             K=self._K,
@@ -101,8 +101,8 @@ class App:
         self._renderer.draw_points(points.cols, points.rows, self._colors[points.trajectory_index])
 
         bounds = self._viewport.bounds
-        self._renderer.draw_hud(bounds.x_min, bounds.y_min, self._engine.K, self._seed_mode,
-                                 self._engine.n_trajectories, fps)
+        self._renderer.draw_hud(HudStatus(bounds.x_min, bounds.y_min, self._engine.K,
+                                          self._seed_mode, self._engine.n_trajectories, fps))
         pygame.display.flip()
 
     # ------------------------------------------------------------------
@@ -146,10 +146,7 @@ class App:
         self._dragging = True
         # restore pre-drag frame, then draw fresh rect — avoids XOR-erase artifacts
         self._surface.blit(self._drag_clean, (0, 0))
-        self._renderer.draw_zoom_rect(
-            self._drag_start[0], self._drag_start[1],
-            event.pos[0], event.pos[1],
-        )
+        self._renderer.draw_zoom_rect(self._drag_start, event.pos)
         pygame.display.flip()
 
     def _on_mouse_up(self, event: pygame.event.Event) -> None:
