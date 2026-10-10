@@ -189,6 +189,7 @@ uv run python standard_map.py   # run without activating manually
 | `standard_map/cli.py` | argparse → `AppConfig` |
 | `standard_map.example.toml` | All configurable values with defaults |
 | `tests/` | pytest suite (headless pygame via `SDL_VIDEODRIVER=dummy`) |
+| `scripts/make_screenshots.py` | Regenerates `docs/screenshots/*.png` used by README |
 
 ## Development Workflow
 
